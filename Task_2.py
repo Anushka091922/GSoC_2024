@@ -1,54 +1,50 @@
-import unittest
 import numpy as np
-from histo_testcases import reduced_histogram
+import time  # Add this import statement for the time module
 
+def reduced_histogram(h, ifirst, ilast):
+    """Creates a new histogram in a reduced (zoomed-in) range.
 
-class TestReducedHistogram(unittest.TestCase):
+    Args:
+        h (np.ndarray): The original histogram.
+        ifirst (int): The starting index for the reduced range (inclusive).
+        ilast (int): The ending index for the reduced range (exclusive).
 
+    Returns:
+        np.ndarray: The reduced histogram.
 
-    def test_valid_range(self):
-        print("Testing valid range with elements [2, 3, 4]:")
-        h = np.array([1, 2, 3, 4, 5])
-        reduced_h = reduced_histogram(h, 1, 4)
-        self.assertEqual(reduced_h.tolist(), [2, 3, 4])  
+    Raises:
+        ValueError: If ifirst or ilast is outside the valid range of h.
+    """
 
+    if ifirst < 0 or ifirst > h.shape[0]:
+        raise ValueError("ifirst is out of bounds")
 
-    def test_out_of_bounds_start(self):
-        print("Testing out of bounds start index:")
-        h = np.array([1, 2, 3, 4, 5])
-        with self.assertRaises(ValueError):
-            reduced_histogram(h, -1, 2)  
+    if ilast < 0 or ilast > h.shape[0]:
+        raise ValueError("ilast is out of bounds")
 
+    if ifirst >= ilast:
+        return np.array([])  # Return an empty array if the range is empty
 
-    def test_out_of_bounds_end(self):
-        print("Testing out of bounds end index:")
-        h = np.array([1, 2, 3, 4, 5])
-        with self.assertRaises(ValueError):
-            reduced_histogram(h, 2, 6)  
+    return h[ifirst:ilast]
 
+def print_reduced_histogram_and_sleep(h, ifirst, ilast, sleep_duration):
+    """Prints the reduced histogram and sleeps for the specified duration.
 
-    def test_maximum_values(self):
-        print("Testing with maximum values:")
-        h = np.array([1000, 2000, 3000, 4000, 5000])
-        reduced_h = reduced_histogram(h, 1, 4)
-        self.assertEqual(reduced_h.tolist(), [2000, 3000, 4000])
+    Args:
+        h (np.ndarray): The original histogram.
+        ifirst (int): The starting index for the reduced range (inclusive).
+        ilast (int): The ending index for the reduced range (exclusive).
+        sleep_duration (int): The duration to sleep in seconds after printing the histogram.
+    """
 
+    reduced_h = reduced_histogram(h, ifirst, ilast)
 
-    def test_negative_values(self):
-        print("Testing with negative values:")
-        h = np.array([-1, -2, -3, -4, -5])
-        reduced_h = reduced_histogram(h, 1, 4)
-        self.assertEqual(reduced_h.tolist(), [-2, -3, -4])
+    print("Reduced Histogram:")
+    print(reduced_h)
 
+    time.sleep(sleep_duration)
 
-    def test_float_values(self):
-        print("Testing with float values:")
-        h = np.array([1.5, 2.3, 3.7, 4.1, 5.9])
-        reduced_h = reduced_histogram(h, 1, 4)
-        self.assertEqual(reduced_h.tolist(), [2.3, 3.7, 4.1])
-
-
-# Read data from the file and execute test cases
+# Example usage
 if __name__ == "__main__":
-    unittest.main()
-
+    h = np.random.rand(100)
+    print_reduced_histogram_and_sleep(h, 10, 20, 5)  # Sleep for 5 seconds after printing the reduced histogram
